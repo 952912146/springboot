@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="10 second" debug="false">
+ 
+    <!-- 负责写日志,控制台日志 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>[%d{HH:mm:ss.SSS}] [%5level] %logger{5} %msg%n</Pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+ 
+    <appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- ThresholdFilter:临界值过滤器，过滤掉 TRACE 和 DEBUG 级别的日志 -->
+        <append>true</append>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>debug</level>
+        </filter>
+        <encoder>
+            <Pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%5level] [%thread] %logger{5} %msg%n</Pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+ 
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 每天生成一个日志文件，保存30天的日志文件
+            - 如果隔一段时间没有输出日志，前面过期的日志不会被删除，只有再重新打印日志的时候，会触发删除过期日志的操作。
+            -->
+            <fileNamePattern>log/info.%d{yyyy-MM-dd}-%i.log</fileNamePattern>
+            <maxHistory>90</maxHistory>
+            <TimeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </TimeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender >
+ 
+ 
+    <springProfile name="prd">
+        <root level="INFO">
+            <appender-ref ref="STDOUT"/>
+			<appender-ref ref="INFO"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="test">
+    
+    	<logger name="com.mj.s.springboot" level="DEBUG"/>
+    	<logger name="org.springframework" level="WARN"/>
+    	
+        <root level="DEBUG">
+            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="INFO"/>
+        </root>
+    </springProfile>
+</configuration>
